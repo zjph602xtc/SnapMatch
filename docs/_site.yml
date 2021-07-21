@@ -1,14 +1,10 @@
-name: "Zero Inflated Poisson Factor Analysis"
+name: "Snapshot Matching"
 output_dir: "."
 navbar:
   title: "Home"
   right:
-    - text: "Matlab Version"
-      href: Matlab.html
-    - text: "R Version"
-      href: R.html
     - icon: fa-github fa-lg
-      href: https://github.com/zjph602xtc/ZIPFA
+      href: https://github.com/zjph602xtc/SnapMatch
 
 output:
   html_document:

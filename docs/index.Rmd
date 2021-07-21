@@ -1,21 +1,112 @@
 ---
-title: "Zero Inflated Poisson Factor Analysis"
+title: "Snapshot Matching (R Verison)"
 output: 
-  html_document
+  html_document:
+    toc: true
+    code_folding: show
+    toc_float: true
+    theme: lumen
 ---
 
-<center><img src = "images/cover.png" style = "width:70%"> </center>
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = FALSE,
+                      message = TRUE,
+                      fig.height = 5,
+                      fig.width = 10)
+
+library(knitr)
+
+```
+<br><br>
+
+# 0. Install Package 'SnapMatch'
+You need to install package [optmatch](https://CRAN.R-project.org/package=optmatch), [rcbalance](https://CRAN.R-project.org/package=rcbalance) before installing the  [SnapMatch] package. It is recommanded to install package [lpSolve](https://CRAN.R-project.org/package=lpSolve) and [RItools](https://CRAN.R-project.org/package=RItools) as well. 
+```{r eval=FALSE}
+install.packages('optmatch')
+install.packages('rcbalance')
+install.packages('lpSolve')
+install.packages('RItools')
+library('optmatch')
+library('rcbalance')
+library('lpSolve')
+library('RItools')
+library('SnapMatch')
+```
+```{r echo=FALSE, message=FALSE}
+library('optmatch')
+library('rcbalance')
+library('lpSolve')
+library('RItools')
+library('SnapMatch')
+```
+
+<br><br>
+
+# 1. Optimal Snapshot Matching
+
+Put some introduction here. 
 
 <br>
+
+# 2. Example
+### 2.1 Load Demo Data
+```{r}
+dat <- SnapMatch:::demo()
+head(dat)
+tail(dat)
+```
 <br>
-<!-- <span style="color:#2C85C2; font-family: Babas; font-size: 1em;">Final Project for Dr. Jeff Goldsmith's Course - [P8105 Data Science I](https://p8105.com)</span><right><img src = "images/sticker.jpg" style = "width:5%"> </right></br> -->
-**See tutorial on the [Matlab version](https://zjph602xtc.github.io/ZIPFA/Matlab.html) or [R version](https://zjph602xtc.github.io/ZIPFA/R.html).**
 
-<span style="color:#2C85C2; font-family: Babas; font-size: 2em;">Authors: </span>
+### 2.1 Match With Covariate Distance
+We can match by mahalanobis/euclidean/rank_mahalanobis distance. 
+```{r fig1, out.width = '80%'}
+  # calculate the distance matrix
+dis <- match_on(trt~X1+X2, data = dat, method="mahalanobis")
+  # conduct optimal matching. 'Id' is the id column for each subject
+pm <- optimatch_snap(dis, data = dat, id = 'id')
+  # plot result
+plot(xBalance(trt ~ X1+X2+strata(pm), data=dat), xlim=c(-2,1), ylim=c(0,3))
+```
 
-Tianchen Xu$^{*}$, &nbsp;&nbsp; tx2155\@columbia.edu,  &nbsp;&nbsp; Department of Biostatistics, Mailman School of Public Health, Columbia University, NY 10032, USA <br><br>
+We find that covariate balance is achieved after snapshot matching. 
 
-Ryan T. Demmer, &nbsp;&nbsp; demm0009\@umn.edu,  &nbsp;&nbsp; Division of Epidemiology, School of Public Health, University of Minnesota, MN 55454, USA <br><br>
+<br>
 
-Gen Li, &nbsp;&nbsp; gl2521\@cumc.columbia.edu,   &nbsp;&nbsp; Department of Biostatistics, Mailman School of Public Health, Columbia University, NY 10032, USA
+### 2.2 Match With Propensity Score
+```{r fig2, out.width = '60%'}
+  # calculate propensity score
+prop <- glm(trt ~ X1+X2, data = dat, family = binomial())
+boxplot(prop)
+```
+
+The groups do overlap, if not greatly. It may be wise to restrict the sample to the region of overlap, at least roughly. 
+
+```{r fig3, out.width = '80%'}
+  # conduct optimal matching by propensity score. 'Id' is the id column for each subject
+pm <- optimatch_snap(prop, data = dat, id = 'id')
+  # plot result
+plot(xBalance(trt ~ X1+X2+strata(pm), data=dat), xlim=c(-2,1), ylim=c(0,3))
+```
+
+We find that similar covariate balance is achieved after snapshot matching. 
+
+<br>
+
+### 2.3 Complex Match With 'match_on' Function
+The package accepts 'match_on' function from 'optmatch' package as a distance matrix. For example, here we show how to perform a snapshot matching within a propensity score caliper.
+```{r fig4, out.width = '80%'}
+  # conduct optimal matching by propensity score. 'Id' is the id column for each subject
+dis <- match_on(glm(trt ~ X1+X2, data = dat, family = binomial()), data = dat, id = 'id')
+dis[1:5,1:5]
+  # add caliper
+dis <- caliper(dis,2) + dis
+dis[1:5,1:5]
+  # conduct optimal matching
+dis <- as.matrix(dis)
+dis[which(is.infinite(dis))] <- 100
+pm <- optimatch_snap(dis, data = dat, id = 'id')
+  # plot result
+plot(xBalance(trt ~ X1+X2+strata(pm), data=dat), xlim=c(-2,1), ylim=c(0,3))
+```
 

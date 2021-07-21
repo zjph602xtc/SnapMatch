@@ -1,36 +1,54 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 
 
-<title>Zero Inflated Poisson Factor Analysis</title>
+<title>Snapshot Matching (R Verison)</title>
 
+<script src="site_libs/header-attrs-2.9/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/lumen.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 
-<style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
-  pre:not([class]) {
-    background-color: white;
-  }
-</style>
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
 <script type="text/javascript">
 if (window.hljs) {
   hljs.configure({languages: []});
@@ -43,32 +61,7 @@ if (window.hljs) {
 
 
 
-<style type="text/css">
-h1 {
-  font-size: 34px;
-}
-h1.title {
-  font-size: 38px;
-}
-h2 {
-  font-size: 30px;
-}
-h3 {
-  font-size: 24px;
-}
-h4 {
-  font-size: 18px;
-}
-h5 {
-  font-size: 16px;
-}
-h6 {
-  font-size: 12px;
-}
-.table th:not([align]) {
-  text-align: left;
-}
-</style>
+
 
 
 
@@ -79,13 +72,8 @@ h6 {
   margin-left: auto;
   margin-right: auto;
 }
-code {
-  color: inherit;
-  background-color: rgba(0, 0, 0, 0.04);
-}
 img {
   max-width:100%;
-  height: auto;
 }
 .tabbed-pane {
   padding-top: 12px;
@@ -99,40 +87,13 @@ button.code-folding-btn:focus {
 summary {
   display: list-item;
 }
+pre code {
+  padding: 0;
+}
 </style>
 
 
 <style type="text/css">
-/* padding for bootstrap navbar */
-body {
-  padding-top: 54px;
-  padding-bottom: 40px;
-}
-/* offset scroll position for anchor links (for fixed navbar)  */
-.section h1 {
-  padding-top: 59px;
-  margin-top: -59px;
-}
-.section h2 {
-  padding-top: 59px;
-  margin-top: -59px;
-}
-.section h3 {
-  padding-top: 59px;
-  margin-top: -59px;
-}
-.section h4 {
-  padding-top: 59px;
-  margin-top: -59px;
-}
-.section h5 {
-  padding-top: 59px;
-  margin-top: -59px;
-}
-.section h6 {
-  padding-top: 59px;
-  margin-top: -59px;
-}
 .dropdown-submenu {
   position: relative;
 }
@@ -160,7 +121,7 @@ body {
   margin-right: -10px;
 }
 .dropdown-submenu:hover>a:after {
-  border-left-color: #ffffff;
+  border-left-color: #adb5bd;
 }
 .dropdown-submenu.pull-left {
   float: none;
@@ -172,7 +133,7 @@ body {
 }
 </style>
 
-<script>
+<script type="text/javascript">
 // manage active state of menu based on current page
 $(document).ready(function () {
   // active menu anchor
@@ -183,10 +144,23 @@ $(document).ready(function () {
   var menuAnchor = $('a[href="' + href + '"]');
 
   // mark it active
-  menuAnchor.parent().addClass('active');
+  menuAnchor.tab('show');
 
   // if it's got a parent navbar menu mark it active as well
   menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
 });
 </script>
 
@@ -198,7 +172,6 @@ $(document).ready(function () {
   max-height: 500px;
   min-height: 44px;
   overflow-y: auto;
-  background: white;
   border: 1px solid #ddd;
   border-radius: 4px;
 }
@@ -234,6 +207,7 @@ $(document).ready(function () {
   border: none;
   display: inline-block;
   border-radius: 4px;
+  background-color: transparent;
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li {
@@ -246,20 +220,74 @@ $(document).ready(function () {
 }
 </style>
 
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-
-$(document).ready(function () {
-  $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
-  });
-});
-</script>
-
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
 
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
 
 
 
@@ -269,6 +297,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -305,26 +343,131 @@ $(document).ready(function () {
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-<div class="fluid-row" id="header">
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
 
 
 
-<h1 class="title toc-ignore">Zero Inflated Poisson Factor Analysis</h1>
+<h1 class="title toc-ignore">Snapshot Matching (R Verison)</h1>
 
 </div>
 
 
-<center>
-<img src = "images/cover.png" style = "width:70%">
-</center>
-<p><br> <br> <!-- <span style="color:#2C85C2; font-family: Babas; font-size: 1em;">Final Project for Dr. Jeff Goldsmith's Course - [P8105 Data Science I](https://p8105.com)</span><right><img src = "images/sticker.jpg" style = "width:5%"> </right></br> --> <strong>See tutorial on the <a href="https://zjph602xtc.github.io/ZIPFA/Matlab.html">Matlab version</a> or <a href="https://zjph602xtc.github.io/ZIPFA/R.html">R version</a>.</strong></p>
-<p><span style="color:#2C85C2; font-family: Babas; font-size: 2em;">Authors: </span></p>
-<p>Tianchen Xu<span class="math inline">\(^{*}\)</span>,    tx2155@columbia.edu,    Department of Biostatistics, Mailman School of Public Health, Columbia University, NY 10032, USA <br><br></p>
-<p>Ryan T. Demmer,    demm0009@umn.edu,    Division of Epidemiology, School of Public Health, University of Minnesota, MN 55454, USA <br><br></p>
-<p>Gen Li,    gl2521@cumc.columbia.edu,    Department of Biostatistics, Mailman School of Public Health, Columbia University, NY 10032, USA</p>
+<p><br><br></p>
+<div id="install-package-snapmatch" class="section level1">
+<h1>0. Install Package ‘SnapMatch’</h1>
+<p>You need to install package <a href="https://CRAN.R-project.org/package=optmatch">optmatch</a>, <a href="https://CRAN.R-project.org/package=rcbalance">rcbalance</a> before installing the [SnapMatch] package. It is recommanded to install package <a href="https://CRAN.R-project.org/package=lpSolve">lpSolve</a> and <a href="https://CRAN.R-project.org/package=RItools">RItools</a> as well.</p>
+<pre class="r"><code>install.packages(&#39;optmatch&#39;)
+install.packages(&#39;rcbalance&#39;)
+install.packages(&#39;lpSolve&#39;)
+install.packages(&#39;RItools&#39;)
+library(&#39;optmatch&#39;)
+library(&#39;rcbalance&#39;)
+library(&#39;lpSolve&#39;)
+library(&#39;RItools&#39;)
+library(&#39;SnapMatch&#39;)</code></pre>
+<p><br><br></p>
+</div>
+<div id="optimal-snapshot-matching" class="section level1">
+<h1>1. Optimal Snapshot Matching</h1>
+<p>Put some introduction here.</p>
+<p><br></p>
+</div>
+<div id="example" class="section level1">
+<h1>2. Example</h1>
+<div id="load-demo-data" class="section level3">
+<h3>2.1 Load Demo Data</h3>
+<pre class="r"><code>dat &lt;- SnapMatch:::demo()
+head(dat)</code></pre>
+<pre><code>##   id trt         X1 X2
+## 1 t1   1 -1.5604756  0
+## 2 t2   1 -1.2301775  1
+## 3 t3   1  0.5587083  1
+## 4 t4   1 -0.9294916  1
+## 5 t5   1 -0.8707123  0
+## 6 t6   1  0.7150650  0</code></pre>
+<pre class="r"><code>tail(dat)</code></pre>
+<pre><code>##       id trt         X1 X2
+## 515  c99   0  1.1146485  2
+## 516 c100   0  0.5500440  1
+## 517 c100   0  1.2366758  3
+## 518 c100   0  0.1390979  1
+## 519 c100   0  0.4102751  2
+## 520 c100   0 -0.5584569  5</code></pre>
+<p><br></p>
+</div>
+<div id="match-with-covariate-distance" class="section level3">
+<h3>2.1 Match With Covariate Distance</h3>
+<p>We can match by mahalanobis/euclidean/rank_mahalanobis distance.</p>
+<pre class="r"><code>  # calculate the distance matrix
+dis &lt;- match_on(trt~X1+X2, data = dat, method=&quot;mahalanobis&quot;)
+  # conduct optimal matching. &#39;Id&#39; is the id column for each subject
+pm &lt;- optimatch_snap(dis, data = dat, id = &#39;id&#39;)
+  # plot result
+plot(xBalance(trt ~ X1+X2+strata(pm), data=dat), xlim=c(-2,1), ylim=c(0,3))</code></pre>
+<p><img src="index_files/figure-html/fig1-1.png" width="80%" /></p>
+<p>We find that covariate balance is achieved after snapshot matching.</p>
+<p><br></p>
+</div>
+<div id="match-with-propensity-score" class="section level3">
+<h3>2.2 Match With Propensity Score</h3>
+<pre class="r"><code>  # calculate propensity score
+prop &lt;- glm(trt ~ X1+X2, data = dat, family = binomial())
+boxplot(prop)</code></pre>
+<p><img src="index_files/figure-html/fig2-1.png" width="60%" /></p>
+<p>The groups do overlap, if not greatly. It may be wise to restrict the sample to the region of overlap, at least roughly.</p>
+<pre class="r"><code>  # conduct optimal matching by propensity score. &#39;Id&#39; is the id column for each subject
+pm &lt;- optimatch_snap(prop, data = dat, id = &#39;id&#39;)
+  # plot result
+plot(xBalance(trt ~ X1+X2+strata(pm), data=dat), xlim=c(-2,1), ylim=c(0,3))</code></pre>
+<p><img src="index_files/figure-html/fig3-1.png" width="80%" /></p>
+<p>We find that similar covariate balance is achieved after snapshot matching.</p>
+<p><br></p>
+</div>
+<div id="complex-match-with-match_on-function" class="section level3">
+<h3>2.3 Complex Match With ‘match_on’ Function</h3>
+<p>The package accepts ‘match_on’ function from ‘optmatch’ package as a distance matrix. For example, here we show how to perform a snapshot matching within a propensity score caliper.</p>
+<pre class="r"><code>  # conduct optimal matching by propensity score. &#39;Id&#39; is the id column for each subject
+dis &lt;- match_on(glm(trt ~ X1+X2, data = dat, family = binomial()), data = dat, id = &#39;id&#39;)
+dis[1:5,1:5]</code></pre>
+<pre><code>##          control
+## treatment       21        22        23        24        25
+##         1 3.438599 1.5015123 2.2027200 2.9487052 1.4033947
+##         2 2.488007 0.5509201 1.2521277 1.9981130 0.4528025
+##         3 1.434081 0.5030065 0.1982011 0.9441864 0.6011241
+##         4 2.310857 0.3737702 1.0749779 1.8209631 0.2756526
+##         5 3.032224 1.0951365 1.7963441 2.5423294 0.9970189</code></pre>
+<pre class="r"><code>  # add caliper
+dis &lt;- caliper(dis,2) + dis
+dis[1:5,1:5]</code></pre>
+<pre><code>##        control
+## treated       21        22        23        24        25
+##       1      Inf 1.5015123       Inf       Inf 1.4033947
+##       2      Inf 0.5509201 1.2521277 1.9981130 0.4528025
+##       3 1.434081 0.5030065 0.1982011 0.9441864 0.6011241
+##       4      Inf 0.3737702 1.0749779 1.8209631 0.2756526
+##       5      Inf 1.0951365 1.7963441       Inf 0.9970189</code></pre>
+<pre class="r"><code>  # conduct optimal matching
+dis &lt;- as.matrix(dis)
+dis[which(is.infinite(dis))] &lt;- 100
+pm &lt;- optimatch_snap(dis, data = dat, id = &#39;id&#39;)
+  # plot result
+plot(xBalance(trt ~ X1+X2+strata(pm), data=dat), xlim=c(-2,1), ylim=c(0,3))</code></pre>
+<p><img src="index_files/figure-html/fig4-1.png" width="80%" /></p>
+</div>
+</div>
 
 
 
+</div>
+</div>
 
 </div>
 
@@ -332,13 +475,64 @@ $(document).ready(function () {
 
 // add bootstrap table styles to pandoc tables
 function bootstrapStylePandocTables() {
-  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
 }
 $(document).ready(function () {
   bootstrapStylePandocTables();
 });
 
 
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
 </script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->

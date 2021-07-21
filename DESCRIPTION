@@ -6,13 +6,9 @@ Date: 2021-07-20
 Author: Tianchen Xu [aut, cre] (<https://orcid.org/0000-0002-0102-7630>),
   Yiyue Lou [aut]
 Maintainer: Tianchen Xu <tx2155@columbia.edu>
-Description: Estimation methods for zero-inflated Poisson factor analysis (ZIPFA) on sparse data. 
-    It provides estimates of coefficients in a new type of zero-inflated regression. 
-    It provides a cross-validation method to determine the potential rank of the data in the ZIPFA 
-    and conducts zero-inflated Poisson factor analysis based on the determined rank.
-URL: https://zjph602xtc.github.io/ZIPFA/,
-        https://arxiv.org/abs/1910.11985
-BugReports: https://github.com/zjph602xtc/ZIPFA/issues
+Description: Snapshot Matching
+URL: https://github.com/zjph602xtc/SnapMatch
+BugReports: https://github.com/zjph602xtc/SnapMatch/issues
 Depends: R (>= 3.2.0)
 Imports: optmatch, lpSolve, rcbalance
 License: GPL (>= 2)

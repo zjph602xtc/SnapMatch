@@ -378,6 +378,7 @@ library(&#39;SnapMatch&#39;)</code></pre>
 <h1>2. Example</h1>
 <div id="load-demo-data" class="section level3">
 <h3>2.1 Load Demo Data</h3>
+<p>The demo dataset contains 20 subjects in the treatment group and 100 subject in the control group. Each subject in the control group has 5 time points.</p>
 <pre class="r"><code>dat &lt;- SnapMatch:::demo()
 head(dat)</code></pre>
 <pre><code>##   id trt         X1 X2
@@ -428,8 +429,8 @@ plot(xBalance(trt ~ X1+X2+strata(pm), data=dat), xlim=c(-2,1), ylim=c(0,3))</cod
 <div id="complex-match-with-match_on-function" class="section level3">
 <h3>2.3 Complex Match With ‘match_on’ Function</h3>
 <p>The package accepts ‘match_on’ function from ‘optmatch’ package as a distance matrix. For example, here we show how to perform a snapshot matching within a propensity score caliper.</p>
-<pre class="r"><code>  # conduct optimal matching by propensity score. &#39;Id&#39; is the id column for each subject
-dis &lt;- match_on(glm(trt ~ X1+X2, data = dat, family = binomial()), data = dat, id = &#39;id&#39;)
+<pre class="r"><code>  # calculate distance by propensity score
+dis &lt;- match_on(glm(trt ~ X1+X2, data = dat, family = binomial()))
 dis[1:5,1:5]</code></pre>
 <pre><code>##          control
 ## treatment       21        22        23        24        25
@@ -448,7 +449,7 @@ dis[1:5,1:5]</code></pre>
 ##       3 1.434081 0.5030065 0.1982011 0.9441864 0.6011241
 ##       4      Inf 0.3737702 1.0749779 1.8209631 0.2756526
 ##       5      Inf 1.0951365 1.7963441       Inf 0.9970189</code></pre>
-<pre class="r"><code>  # conduct optimal matching
+<pre class="r"><code>  # conduct optimal snapshot matching
 dis &lt;- as.matrix(dis)
 dis[which(is.infinite(dis))] &lt;- 100
 pm &lt;- optimatch_snap(dis, data = dat, id = &#39;id&#39;)

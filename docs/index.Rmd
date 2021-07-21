@@ -51,6 +51,7 @@ Put some introduction here.
 
 # 2. Example
 ### 2.1 Load Demo Data
+The demo dataset contains 20 subjects in the treatment group and 100 subject in the control group. Each subject in the control group has 5 time points. 
 ```{r}
 dat <- SnapMatch:::demo()
 head(dat)
@@ -96,13 +97,13 @@ We find that similar covariate balance is achieved after snapshot matching.
 ### 2.3 Complex Match With 'match_on' Function
 The package accepts 'match_on' function from 'optmatch' package as a distance matrix. For example, here we show how to perform a snapshot matching within a propensity score caliper.
 ```{r fig4, out.width = '80%'}
-  # conduct optimal matching by propensity score. 'Id' is the id column for each subject
-dis <- match_on(glm(trt ~ X1+X2, data = dat, family = binomial()), data = dat, id = 'id')
+  # calculate distance by propensity score
+dis <- match_on(glm(trt ~ X1+X2, data = dat, family = binomial()))
 dis[1:5,1:5]
   # add caliper
 dis <- caliper(dis,2) + dis
 dis[1:5,1:5]
-  # conduct optimal matching
+  # conduct optimal snapshot matching
 dis <- as.matrix(dis)
 dis[which(is.infinite(dis))] <- 100
 pm <- optimatch_snap(dis, data = dat, id = 'id')

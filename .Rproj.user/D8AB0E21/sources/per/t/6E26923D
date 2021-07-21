@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1585641101480.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3373560707",
+    "id" : "6E26923D",
+    "lastKnownWriteTime" : 1585684191,
+    "last_content_update" : 1585684191801,
+    "path" : "C:/Users/Peter Xu/Desktop/Research/ZIPFA/Codes/ZIPFA/man/cv_ZIPFA.Rd",
+    "project_path" : "man/cv_ZIPFA.Rd",
+    "properties" : {
+        "cursorPosition" : "46,1",
+        "scrollLine" : "33"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_doc"
+}

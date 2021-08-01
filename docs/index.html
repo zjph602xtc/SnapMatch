@@ -369,13 +369,19 @@ library(&#39;RItools&#39;)
 library(&#39;SnapMatch&#39;)</code></pre>
 <p><br><br></p>
 </div>
-<div id="optimal-snapshot-matching" class="section level1">
-<h1>1. Optimal Snapshot Matching</h1>
+<div id="snapshot-matching" class="section level1">
+<h1>1. Snapshot Matching</h1>
+<div id="optimal-snapshot-matching" class="section level3">
+<h3>1.1 Optimal Snapshot Matching</h3>
+</div>
+<div id="nearest-greedy-snapshot-matching" class="section level3">
+<h3>1.2 Nearest (Greedy) Snapshot Matching</h3>
 <p>Put some introduction here.</p>
 <p><br></p>
 </div>
-<div id="example" class="section level1">
-<h1>2. Example</h1>
+</div>
+<div id="optimal-snapshot-matching-example" class="section level1">
+<h1>2. Optimal Snapshot Matching Example</h1>
 <div id="load-demo-data" class="section level3">
 <h3>2.1 Load Demo Data</h3>
 <p>The demo dataset contains 20 subjects in the treatment group and 100 subject in the control group. Each subject in the control group has 5 time points.</p>
@@ -399,12 +405,12 @@ head(dat)</code></pre>
 <p><br></p>
 </div>
 <div id="match-with-covariate-distance" class="section level3">
-<h3>2.1 Match With Covariate Distance</h3>
+<h3>2.2 Match With Covariate Distance</h3>
 <p>We can match by mahalanobis/euclidean/rank_mahalanobis distance.</p>
 <pre class="r"><code>  # calculate the distance matrix
 dis &lt;- match_on(trt~X1+X2, data = dat, method=&quot;mahalanobis&quot;)
   # conduct optimal matching. &#39;Id&#39; is the id column for each subject
-pm &lt;- optimatch_snap(dis, data = dat, id = &#39;id&#39;)
+pm &lt;- optmatch_snap(dis, data = dat, id = &#39;id&#39;)
   # plot result
 plot(xBalance(trt ~ X1+X2+strata(pm), data=dat), xlim=c(-2,1), ylim=c(0,3))</code></pre>
 <p><img src="index_files/figure-html/fig1-1.png" width="80%" /></p>
@@ -412,14 +418,14 @@ plot(xBalance(trt ~ X1+X2+strata(pm), data=dat), xlim=c(-2,1), ylim=c(0,3))</cod
 <p><br></p>
 </div>
 <div id="match-with-propensity-score" class="section level3">
-<h3>2.2 Match With Propensity Score</h3>
+<h3>2.3 Match With Propensity Score</h3>
 <pre class="r"><code>  # calculate propensity score
 prop &lt;- glm(trt ~ X1+X2, data = dat, family = binomial())
 boxplot(prop)</code></pre>
 <p><img src="index_files/figure-html/fig2-1.png" width="60%" /></p>
 <p>The groups do overlap, if not greatly. It may be wise to restrict the sample to the region of overlap, at least roughly.</p>
 <pre class="r"><code>  # conduct optimal matching by propensity score. &#39;Id&#39; is the id column for each subject
-pm &lt;- optimatch_snap(prop, data = dat, id = &#39;id&#39;)
+pm &lt;- optmatch_snap(trt ~ X1+X2, data = dat, id = &#39;id&#39;)
   # plot result
 plot(xBalance(trt ~ X1+X2+strata(pm), data=dat), xlim=c(-2,1), ylim=c(0,3))</code></pre>
 <p><img src="index_files/figure-html/fig3-1.png" width="80%" /></p>
@@ -427,7 +433,7 @@ plot(xBalance(trt ~ X1+X2+strata(pm), data=dat), xlim=c(-2,1), ylim=c(0,3))</cod
 <p><br></p>
 </div>
 <div id="complex-match-with-match_on-function" class="section level3">
-<h3>2.3 Complex Match With ‘match_on’ Function</h3>
+<h3>2.4 Complex Match With ‘match_on’ Function</h3>
 <p>The package accepts ‘match_on’ function from ‘optmatch’ package as a distance matrix. For example, here we show how to perform a snapshot matching within a propensity score caliper.</p>
 <pre class="r"><code>  # calculate distance by propensity score
 dis &lt;- match_on(glm(trt ~ X1+X2, data = dat, family = binomial()))
@@ -452,10 +458,78 @@ dis[1:5,1:5]</code></pre>
 <pre class="r"><code>  # conduct optimal snapshot matching
 dis &lt;- as.matrix(dis)
 dis[which(is.infinite(dis))] &lt;- 100
-pm &lt;- optimatch_snap(dis, data = dat, id = &#39;id&#39;)
+pm &lt;- optmatch_snap(dis, data = dat, id = &#39;id&#39;)
   # plot result
 plot(xBalance(trt ~ X1+X2+strata(pm), data=dat), xlim=c(-2,1), ylim=c(0,3))</code></pre>
 <p><img src="index_files/figure-html/fig4-1.png" width="80%" /></p>
+</div>
+</div>
+<div id="nearest-snapshot-matching-example" class="section level1">
+<h1>3. Nearest Snapshot Matching Example</h1>
+<div id="load-demo-data-1" class="section level3">
+<h3>3.1 Load Demo Data</h3>
+<p>The demo dataset contains 20 subjects in the treatment group and 100 subject in the control group. Each subject in the control group has 5 time points.</p>
+<pre class="r"><code>dat &lt;- SnapMatch:::demo()</code></pre>
+<p><br></p>
+</div>
+<div id="match-with-covariate-distance-1" class="section level3">
+<h3>3.2 Match With Covariate Distance</h3>
+<p>We can match by mahalanobis/euclidean/rank_mahalanobis distance.</p>
+<pre class="r"><code>  # calculate the distance matrix
+dis &lt;- match_on(trt~X1+X2, data = dat, method=&quot;mahalanobis&quot;)
+  # conduct nearest matching. &#39;Id&#39; is the id column for each subject
+pm &lt;- match_snap(dis, data = dat, id = &#39;id&#39;)
+  # plot result
+plot(xBalance(trt ~ X1+X2+strata(pm), data=dat), xlim=c(-2,1), ylim=c(0,3))</code></pre>
+<p><img src="index_files/figure-html/fig5-1.png" width="80%" /></p>
+<p>We find that covariate balance is achieved after snapshot matching.</p>
+<p><br></p>
+</div>
+<div id="match-with-propensity-score-1" class="section level3">
+<h3>3.3 Match With Propensity Score</h3>
+<pre class="r"><code>  # calculate propensity score
+prop &lt;- glm(trt ~ X1+X2, data = dat, family = binomial())
+boxplot(prop)</code></pre>
+<p><img src="index_files/figure-html/fig6-1.png" width="60%" /></p>
+<p>The groups do overlap, if not greatly. It may be wise to restrict the sample to the region of overlap, at least roughly.</p>
+<pre class="r"><code>  # conduct nearest matching by propensity score. &#39;Id&#39; is the id column for each subject
+pm &lt;- match_snap(trt ~ X1+X2, data = dat, id = &#39;id&#39;)
+  # plot result
+plot(xBalance(trt ~ X1+X2+strata(pm), data=dat), xlim=c(-2,1), ylim=c(0,3))</code></pre>
+<p><img src="index_files/figure-html/fig7-1.png" width="80%" /></p>
+<p>We find that similar covariate balance is achieved after snapshot matching.</p>
+<p><br></p>
+</div>
+<div id="complex-match-with-match_on-function-1" class="section level3">
+<h3>3.4 Complex Match With ‘match_on’ Function</h3>
+<p>The package accepts ‘match_on’ function from ‘optmatch’ package as a distance matrix. For example, here we show how to perform a snapshot matching within a propensity score caliper.</p>
+<pre class="r"><code>  # calculate distance by propensity score
+dis &lt;- match_on(glm(trt ~ X1+X2, data = dat, family = binomial()))
+dis[1:5,1:5]</code></pre>
+<pre><code>##          control
+## treatment       21        22        23        24        25
+##         1 3.438599 1.5015123 2.2027200 2.9487052 1.4033947
+##         2 2.488007 0.5509201 1.2521277 1.9981130 0.4528025
+##         3 1.434081 0.5030065 0.1982011 0.9441864 0.6011241
+##         4 2.310857 0.3737702 1.0749779 1.8209631 0.2756526
+##         5 3.032224 1.0951365 1.7963441 2.5423294 0.9970189</code></pre>
+<pre class="r"><code>  # add caliper
+dis &lt;- caliper(dis,2) + dis
+dis[1:5,1:5]</code></pre>
+<pre><code>##        control
+## treated       21        22        23        24        25
+##       1      Inf 1.5015123       Inf       Inf 1.4033947
+##       2      Inf 0.5509201 1.2521277 1.9981130 0.4528025
+##       3 1.434081 0.5030065 0.1982011 0.9441864 0.6011241
+##       4      Inf 0.3737702 1.0749779 1.8209631 0.2756526
+##       5      Inf 1.0951365 1.7963441       Inf 0.9970189</code></pre>
+<pre class="r"><code>  # conduct nearest snapshot matching
+dis &lt;- as.matrix(dis)
+dis[which(is.infinite(dis))] &lt;- 100
+pm &lt;- match_snap(dis, data = dat, id = &#39;id&#39;)
+  # plot result
+plot(xBalance(trt ~ X1+X2+strata(pm), data=dat), xlim=c(-2,1), ylim=c(0,3))</code></pre>
+<p><img src="index_files/figure-html/fig8-1.png" width="80%" /></p>
 </div>
 </div>
 

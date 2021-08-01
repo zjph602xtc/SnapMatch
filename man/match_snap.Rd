@@ -1,12 +1,12 @@
-\name{optimatch_snap}
-\alias{optimatch_snap}
+\name{match_snap}
+\alias{match_snap}
 
 \title{Snapshot Matching}
 \description{
 Longitudinal snapshot matching.
 }
 \usage{
-optimatch_snap(
+match_snap(
   x,
   data,
   id,
@@ -14,7 +14,7 @@ optimatch_snap(
 }
 
 \arguments{
-  \item{x}{Any valid input to \code{match_on}. \code{optimatch_snap} will use
+  \item{x}{Any valid input to \code{match_on}. \code{match_snap} will use
 \code{x} and any optional arguments to generate a distance before performing
 the matching.
 
@@ -29,7 +29,7 @@ are used. Useful to pass if you want to
 combine a match (using, e.g., \code{cbind}) with the data that were used to
 generate it (for example, in a propensity score matching).}
   \item{id}{A string to indicate which column of the \code{data} is the subject ID.}
-  \item{tol}{The minimum difference in distance that \code{optimatch_snap} will differentiate.}
+  \item{tol}{The minimum difference in distance that \code{match_snap} will differentiate.}
 }
 
 \details{The usage of this function is very similar to the \code{fullmatch} in the \pkg{optmatch} package.}
@@ -48,16 +48,16 @@ dat <- SnapMatch:::demo()
 ### Match With Covariate Distance
   # calculate the distance matrix
 dis <- match_on(trt~X1+X2, data = dat, method="mahalanobis")
-  # conduct optimal matching. 'Id' is the id column for each subject
-pm <- optimatch_snap(dis, data = dat, id = 'id')
+  # conduct nearest matching. 'Id' is the id column for each subject
+pm <- match_snap(dis, data = dat, id = 'id')
   # plot result
 # plot(xBalance(trt ~ X1+X2+strata(pm), data=dat), xlim=c(-2,1), ylim=c(0,3))
 
 ### Match With Propensity Score
   # calculate propensity score
 prop <- glm(trt ~ X1+X2, data = dat, family = binomial())
-  # conduct optimal matching by propensity score. 'Id' is the id column for each subject
-pm <- optimatch_snap(prop, data = dat, id = 'id')
+  # conduct nearest matching by propensity score. 'Id' is the id column for each subject
+pm <- match_snap(prop, data = dat, id = 'id')
   # plot result
 # plot(xBalance(trt ~ X1+X2+strata(pm), data=dat), xlim=c(-2,1), ylim=c(0,3))
 
@@ -66,10 +66,10 @@ pm <- optimatch_snap(prop, data = dat, id = 'id')
 dis <- match_on(glm(trt ~ X1+X2, data = dat, family = binomial()))
   # add caliper
 dis <- caliper(dis,2) + dis
-  # conduct optimal snapshot matching
+  # conduct nearest snapshot matching
 dis <- as.matrix(dis)
 dis[which(is.infinite(dis))] <- 100
-pm <- optimatch_snap(dis, data = dat, id = 'id')
+pm <- match_snap(dis, data = dat, id = 'id')
   # plot result
 # plot(xBalance(trt ~ X1+X2+strata(pm), data=dat), xlim=c(-2,1), ylim=c(0,3))
 

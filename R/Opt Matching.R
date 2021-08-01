@@ -4,9 +4,9 @@
 #' @importFrom stats glm.fit rbinom rnorm
 
 #' @export
-optimatch_snap <-
+optmatch_snap <-
   function (x, ...)
-    UseMethod("optimatch_snap")
+    UseMethod("optmatch_snap")
 
 # optimized version
 opt_match_internal <- function(logitpsn, id, nt, n, tol=1e-6){
@@ -112,7 +112,7 @@ demo <- function(){
 }
 
 #' @export
-optimatch_snap.matrix <- function(x, data, id, tol=1e-6){
+optmatch_snap.matrix <- function(x, data, id, tol=1e-6){
   dat_t <- data[rownames(data) %in% rownames(x),]
   dat_c <- data[rownames(data) %in% colnames(x),]
   # if (dat_c)
@@ -130,18 +130,18 @@ optimatch_snap.matrix <- function(x, data, id, tol=1e-6){
 }
 
 #' @export
-optimatch_snap.formula <- function(x, data, id, tol=1e-6){
+optmatch_snap.formula <- function(x, data, id, tol=1e-6){
   x <- match_on(x, data=data, method="mahalanobis")
-  optimatch_snap.matrix(x, data, id, tol)
+  optmatch_snap.matrix(x, data, id, tol)
 }
 
 #' @export
-optimatch_snap.glm <- optimatch_snap.formula
+optmatch_snap.glm <- optmatch_snap.formula
 #' @export
-optimatch_snap.bigglm <- optimatch_snap.formula
+optmatch_snap.bigglm <- optmatch_snap.formula
 #' @export
-optimatch_snap.optmatch.dlist <- optimatch_snap.matrix
+optmatch_snap.optmatch.dlist <- optmatch_snap.matrix
 #' @export
-optimatch_snap.InfinitySparseMatrix <- optimatch_snap.matrix
+optmatch_snap.InfinitySparseMatrix <- optmatch_snap.matrix
 #' @export
-optimatch_snap.BlockedInfinitySparseMatrix <- optimatch_snap.matrix
+optmatch_snap.BlockedInfinitySparseMatrix <- optmatch_snap.matrix

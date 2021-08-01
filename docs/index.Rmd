@@ -34,6 +34,7 @@ library('RItools')
 library('SnapMatch')
 ```
 ```{r echo=FALSE, message=FALSE}
+set.seed(188)
 library('optmatch')
 library('rcbalance')
 library('lpSolve')
@@ -107,8 +108,6 @@ dis[1:5,1:5]
 dis <- caliper(dis,2) + dis
 dis[1:5,1:5]
   # conduct optimal snapshot matching
-dis <- as.matrix(dis)
-dis[which(is.infinite(dis))] <- 100
 pm <- optmatch_snap(dis, data = dat, id = 'id')
   # plot result
 plot(xBalance(trt ~ X1+X2+strata(pm), data=dat), xlim=c(-2,1), ylim=c(0,3))
@@ -167,9 +166,22 @@ dis[1:5,1:5]
 dis <- caliper(dis,2) + dis
 dis[1:5,1:5]
   # conduct nearest snapshot matching
-dis <- as.matrix(dis)
-dis[which(is.infinite(dis))] <- 100
 pm <- match_snap(dis, data = dat, id = 'id')
   # plot result
 plot(xBalance(trt ~ X1+X2+strata(pm), data=dat), xlim=c(-2,1), ylim=c(0,3))
 ```
+
+<!-- # 4. Error -->
+<!-- ### 4.1 Too small 'caliper' -->
+<!-- When the 'caliper' is too small, there might not enough pairs to match -->
+<!-- ```{r} -->
+<!--   # calculate distance by propensity score -->
+<!-- dis <- match_on(glm(trt ~ X1+X2, data = dat, family = binomial())) -->
+<!-- dis[1:5,1:5] -->
+<!--   # add a very small caliper -->
+<!-- dis <- caliper(dis,0.001) + dis -->
+<!-- dis[1:5,1:5] -->
+<!--   # conduct nearest snapshot matching -->
+<!-- pm <- optmatch_snap(dis, data = dat, id = 'id') -->
+<!-- pm -->
+<!-- ``` -->

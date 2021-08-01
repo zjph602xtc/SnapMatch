@@ -120,7 +120,9 @@ optmatch_snap.matrix <- function(x, data, id, tol=1e-6){
 
   dat <- rbind(dat_t, dat_c)
   dat_c$myidxxx <- as.numeric(factor(dat_c[,id],unique(dat_c[,id])))
-  matched <- opt_match_internal(as.matrix(x), id = dat_c$myidxxx, nt = NROW(dat_t), n = length(unique(dat_c[,'id'])))
+  x <- as.matrix(x)
+  x[is.infinite(x)] <- 20*max(max(x[!is.infinite(x)]))
+  matched <- opt_match_internal(x, id = dat_c$myidxxx, nt = NROW(dat_t), n = length(unique(dat_c[,'id'])))
   dat$pmxxx <- NA
   dat$pmxxx[matched+NROW(dat_t)] <- as.character(dat_t[,id])
   dat$pmxxx[1:NROW(dat_t)] <- as.character(dat[1:NROW(dat_t),id])

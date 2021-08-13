@@ -1,7 +1,7 @@
 \name{optmatch_snap}
 \alias{optmatch_snap}
 
-\title{Snapshot Matching}
+\title{Optimal Snapshot Matching}
 \description{
 Longitudinal snapshot matching.
 }
@@ -23,6 +23,7 @@ non-negative discrepancies, each indicating the permissibility and
 desirability of matching the unit corresponding to its row (a 'treatment') to
 the unit corresponding to its column (a 'control'); or, better, a distance
 specification as produced by \code{\link{match_on}}.}
+\item{controls}{The number of controls to be matched to each treatment.}
   \item{data}{\code{data.frame} to use to get order
 of the final matching factor. If a \code{data.frame}, the \code{rownames}
 are used. Useful to pass if you want to
@@ -61,7 +62,7 @@ pm <- optmatch_snap(prop, data = dat, id = 'id')
   # plot result
 # plot(xBalance(trt ~ X1+X2+strata(pm), data=dat), xlim=c(-2,1), ylim=c(0,3))
 
-### Complex Match With ‘match_on’ Function
+### Complex Match With 'match_on' Function
   # calculate distance by propensity score
 dis <- match_on(glm(trt ~ X1+X2, data = dat, family = binomial()))
   # add caliper
